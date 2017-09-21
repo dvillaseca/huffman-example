@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <title>Huffman</title>
+    <style>
+        p {
+            word-wrap: break-word;
+            max-height: 100;
+            overflow: auto;
+            border: 1px solid #ccc;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #result {
+            height: 50px;
+            width: 100%;
+        }
+
+        #result h1 {
+            height: 100%;
+            width: 50%;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            float: left;
+            vertical-align: middle;
+            line-height: 50px;
+        }
+
+        textarea {
+            width: 50%;
+            height: calc(25% - 100px);
+            float: left;
+        }
+
+        button {
+            width: 50%;
+            height: 50px;
+            float: left;
+        }
+
+        #mainCanvas {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="result"></div>
+    <textarea id="inputText" rows="15" maxlength="100000"></textarea>
+    <textarea id="inputBinary" rows="15" maxlength="100000"></textarea>
+    <button onclick="generateTree()">Compress</button>
+    <button onclick="generateText()">Decompress</button>
+    <canvas id="mainCanvas" width="600" height="600"></canvas>
+    <script src="huffman.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
