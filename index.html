@@ -52,12 +52,15 @@
 </head>
 
 <body>
-    <div id="result"></div>
+    <div id="result">
+        <h1>Uncompressed</h1>
+        <h1>Compressed</h1>
+    </div>
     <textarea id="inputText" rows="15" maxlength="100000"></textarea>
     <textarea id="inputBinary" rows="15" maxlength="100000"></textarea>
     <button onclick="generateTree()">Compress</button>
     <button onclick="generateText()">Decompress</button>
-    <canvas id="mainCanvas" width="600" height="600"></canvas>
+    <canvas id="mainCanvas"></canvas>
     <script src="huffman.js"></script>
     <script src="app.js"></script>
 </body>

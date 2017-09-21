@@ -2,6 +2,7 @@ class HuffmanTree {
     constructor() {
         this.tree = null;
         this.letters = null;
+        this.canvasScale = 1;
     }
     compress(text) {
         var letters = text.split('');
@@ -12,23 +13,19 @@ class HuffmanTree {
             }
             lettersCount[letters[i]]++;
         }
-        var sortable = [];
-        for (var l in lettersCount) {
-            sortable.push([l, lettersCount[l]]);
-        }
-        sortable.sort(function (a, b) {
-            return b[1] - a[1];
-        });
         this.tree = [];
-        for (var i = 0; i < sortable.length; i++) {
+        for (var letter in lettersCount) {
             this.tree.push({
-                sum: sortable[i][1],
-                letters: [sortable[i][0]],
+                sum: lettersCount[letter],
+                letters: [letter],
                 left: null,
                 right: null,
-                letter: sortable[i][0]
+                letter: letter
             });
         }
+        this.tree.sort(function (a, b) {
+            return b.sum - a.sum;
+        });
         this.letters = letters;
         this.makeTree();
         var compressedText = this.compressText();
@@ -89,59 +86,61 @@ class HuffmanTree {
             this.serializeTree(node.right, bin);
         }
     }
-    drawTree(ctx, center) {
-        ctx.font = "12px Arial";
+    drawTree(ctx, center, canvasScale) {
+        if (this.tree == null)
+            return;
+        this.canvasScale = canvasScale;
+        ctx.font = (12 * this.canvasScale) + "px Arial";
         ctx.textAlign = "center";
         ctx.beginPath();
-        this.drawNode(ctx, this.tree, center.x, center.y);
+        this.drawNode(ctx, this.tree, center.x, center.y, 50 * this.canvasScale * this.tree.letters.length);
         ctx.closePath();
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2 * this.canvasScale;
         ctx.strokeStyle = '#888888';
         ctx.stroke();
     }
-    drawNode(ctx, node, x, y) {
+    drawNode(ctx, node, x, y, xSize) {
         ctx.closePath();
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2 * this.canvasScale;
         ctx.strokeStyle = '#888888';
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.arc(x, y, 10, 0, 2 * Math.PI, false);
+        ctx.arc(x, y, 10 * this.canvasScale, 0, 2 * Math.PI, false);
         ctx.fillStyle = '#888888';
         ctx.fill();
         ctx.closePath();
         if (node.letter != null) {
-            
+
             ctx.fillStyle = '#000000';
-            ctx.fillText(node.sum.toString(), x, y + 4);
+            ctx.fillText(node.sum.toString(), x, y + 4 * this.canvasScale);
 
             ctx.beginPath();
-            ctx.arc(x, y + 20, 10, 0, 2 * Math.PI, false);
+            ctx.arc(x, y + 20 * this.canvasScale, 10 * this.canvasScale, 0, 2 * Math.PI, false);
             ctx.fillStyle = '#ff0000';
             ctx.fill();
             ctx.closePath();
-            
+
             ctx.fillStyle = '#000000';
-            ctx.fillText(node.letter, x, y + 24);
+            ctx.fillText(node.letter, x, y + 24 * this.canvasScale);
         }
         else {
             ctx.beginPath();
             var lx = x, ly = y, rx = x, ry = y;
-            var le = Math.pow(node.letters.length, 0.9) * 10;
-            ry += le;
-            ly += le;
-            rx += le;
-            lx -= le;
+            ry += 40 * this.canvasScale;
+            ly += 40 * this.canvasScale;
+            rx += xSize;
+            lx -= xSize;
             ctx.moveTo(x, y);
             ctx.lineTo(lx, ly);
             ctx.moveTo(x, y);
             ctx.lineTo(rx, ry);
 
-            this.drawNode(ctx, node.left, lx, ly);
-            this.drawNode(ctx, node.right, rx, ry);
+            this.drawNode(ctx, node.left, lx, ly, xSize * 0.5);
+            this.drawNode(ctx, node.right, rx, ry, xSize * 0.5);
 
             ctx.fillStyle = '#000000';
-            ctx.fillText(node.sum.toString(), x, y + 4);
+            ctx.fillText(node.sum.toString(), x, y + 4 * this.canvasScale);
         }
     }
     numberToBinary(num) {
@@ -149,7 +148,16 @@ class HuffmanTree {
         return "00000000000000000000000000000000".slice(String(bb).length) + bb;
     }
     decompress(binaryString) {
-        var serializedArray = binaryString.split('').map(function (val) { return parseInt(val); });
+        var invalid = false;
+        var serializedArray = binaryString.split('').map(function (val) {
+            var i = parseInt(val);
+            if (i > 1 || i < 0)
+                invalid = true;
+            return i;
+        });
+        if (invalid) {
+            return "";
+        }
         var treeLength = this.binToNumber(serializedArray.slice(0, 32));
         this.tree = this.deserializeTree(serializedArray.slice(32, treeLength + 32));
         return this.decompressText(serializedArray.slice(treeLength + 32, serializedArray.length), this.tree);
